@@ -45,6 +45,13 @@ CREATE TABLE Cat_Ubicacion (
     tipo_ubicacion VARCHAR(20) NOT NULL CHECK (tipo_ubicacion IN ('Principal', 'Frio', 'Contingencia'))
 );
 
+-- Catálogo de Clientes
+CREATE TABLE Cat_Cliente (
+id_cliente INT IDENTITY(1,1) PRIMARY KEY,
+nombre_razon_social VARCHAR(150) NOT NULL UNIQUE,
+tipo_cliente VARCHAR(50) NOT NULL
+);
+
 -- -----------------------------------------------------------------------------
 -- 2. OPERACIONES DE ACOPIO Y LOGÍSTICA
 -- -----------------------------------------------------------------------------
@@ -109,4 +116,13 @@ CREATE TABLE Detalle_Venta_Kilo (
     precio_por_kg DECIMAL(6,2) NOT NULL CHECK (precio_por_kg > 0.00),
     subtotal AS (peso_vendido_kg * precio_por_kg) PERSISTED
 );
+
+-- Tabla puente para relacionar qué lote específico se vendió
+CREATE TABLE Venta_Lote (
+id_venta_lote INT IDENTITY(1,1) PRIMARY KEY,
+id_detalle_venta INT NOT NULL FOREIGN KEY REFERENCES Detalle_Venta_Kilo(id_detalle_venta) ON DELETE CASCADE,
+id_lote INT NOT NULL FOREIGN KEY REFERENCES Lote_Acopio(id_lote),
+kilos_descontados DECIMAL(8,2) NOT NULL CHECK (kilos_descontados > 0.00)
+);
+
 GO
