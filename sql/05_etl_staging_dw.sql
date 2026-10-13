@@ -6,7 +6,7 @@
 -- DESCRIPCIÓN: Script ETL Completo (Creación de SP de Tiempo + Carga OLTP -> DW)
 -- =============================================================================
 
-USE JOSBECORSA_DW;
+USE JOSBECORSA_DW
 GO
 
 -- -----------------------------------------------------------------------------
@@ -17,14 +17,14 @@ CREATE OR ALTER PROCEDURE usp_Poblar_Dim_Tiempo
     @p_anio_fin INT = 2027
 AS
 BEGIN
-    SET NOCOUNT ON;
+    SET NOCOUNT ON
     
-    DECLARE @v_fecha_actual DATE = DATEFROMPARTS(@p_anio_inicio, 1, 1);
-    DECLARE @v_fecha_limite DATE = DATEFROMPARTS(@p_anio_fin, 12, 31);
+    DECLARE @v_fecha_actual DATE = DATEFROMPARTS(@p_anio_inicio, 1, 1)
+    DECLARE @v_fecha_limite DATE = DATEFROMPARTS(@p_anio_fin, 12, 31)
 
     WHILE @v_fecha_actual <= @v_fecha_limite
     BEGIN
-        DECLARE @v_id_tiempo INT = CAST(CONVERT(VARCHAR(8), @v_fecha_actual, 112) AS INT);
+        DECLARE @v_id_tiempo INT = CAST(CONVERT(VARCHAR(8), @v_fecha_actual, 112) AS INT)
 
         IF NOT EXISTS (SELECT 1 FROM DIM_TIEMPO WHERE id_tiempo = @v_id_tiempo)
         BEGIN
@@ -40,15 +40,15 @@ BEGIN
             )
         END
 
-        SET @v_fecha_actual = DATEADD(DAY, 1, @v_fecha_actual);
+        SET @v_fecha_actual = DATEADD(DAY, 1, @v_fecha_actual)
     END
-END;
+END
 GO
 
 -- -----------------------------------------------------------------------------
 -- PASO 2: EJECUCIÓN DEL PROCEDIMIENTO PARA GENERAR EL CALENDARIO ANALÍTICO
 -- -----------------------------------------------------------------------------
-EXEC usp_Poblar_Dim_Tiempo @p_anio_inicio = 2025, @p_anio_fin = 2027;
+EXEC usp_Poblar_Dim_Tiempo @p_anio_inicio = 2025, @p_anio_fin = 2027
 GO
 
 -- -----------------------------------------------------------------------------

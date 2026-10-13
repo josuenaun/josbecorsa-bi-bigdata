@@ -36,24 +36,24 @@ ON Detalle_Venta_Kilo
 FOR UPDATE
 AS
 BEGIN
-    SET NOCOUNT ON;
+    SET NOCOUNT ON
     
-    DECLARE @v_precio_anterior DECIMAL(6,2);
-    DECLARE @v_precio_nuevo DECIMAL(6,2);
-    DECLARE @v_id_detalle INT;
+    DECLARE @v_precio_anterior DECIMAL(6,2)
+    DECLARE @v_precio_nuevo DECIMAL(6,2)
+    DECLARE @v_id_detalle INT
 
-    SELECT @v_precio_anterior = precio_por_kg FROM deleted;
-    SELECT @v_precio_nuevo = precio_por_kg, @v_id_detalle = id_detalle_venta FROM inserted;
+    SELECT @v_precio_anterior = precio_por_kg FROM deleted
+    SELECT @v_precio_nuevo = precio_por_kg, @v_id_detalle = id_detalle_venta FROM inserted
 
     IF @v_precio_nuevo > (@v_precio_anterior * 1.30)
     BEGIN
-        ROLLBACK TRANSACTION;
-        RAISERROR('!! OPERACIÓN CANCELADA: El incremento del precio por kilo no puede superar el 30%% del valor previo.', 16, 1);
-        RETURN;
+        ROLLBACK TRANSACTION
+        RAISERROR('!! OPERACIÓN CANCELADA: El incremento del precio por kilo no puede superar el 30%% del valor previo.', 16, 1)
+        RETURN
     END
 
     INSERT INTO Log_Auditoria_Precios (id_detalle_venta, precio_anterior, precio_nuevo)
-    VALUES (@v_id_detalle, @v_precio_anterior, @v_precio_nuevo);
+    VALUES (@v_id_detalle, @v_precio_anterior, @v_precio_nuevo)
 END
 GO
 
@@ -65,7 +65,7 @@ ON DATABASE
 FOR DROP_TABLE
 AS
 BEGIN
-    SET NOCOUNT ON;
+    SET NOCOUNT ON
     RAISERROR('!! ACCIÓN PROHIBIDA: Se requiere autorización explícita para eliminar estructuras en JOSBECORSA_OLTP.', 16, 1)
     ROLLBACK
 END
@@ -86,7 +86,7 @@ CREATE OR ALTER PROCEDURE usp_RegistrarInboundLoteTransaccional
     @p_resultado VARCHAR(300) OUTPUT
 AS
 BEGIN
-    SET NOCOUNT ON;
+    SET NOCOUNT ON
     DECLARE @v_id_lote INT
 
     BEGIN TRANSACTION

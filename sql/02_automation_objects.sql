@@ -29,7 +29,7 @@ FROM Lote_Acopio l
 INNER JOIN Detalle_Jaba j ON l.id_lote = j.id_lote
 INNER JOIN Cat_VariedadPalta v ON j.id_variedad = v.id_variedad
 INNER JOIN Cat_Calidad c ON j.id_calidad = c.id_calidad
-GROUP BY l.codigo_lote, l.origen_provincia, v.nombre_variedad, c.nombre_calidad;
+GROUP BY l.codigo_lote, l.origen_provincia, v.nombre_variedad, c.nombre_calidad
 GO
 
 -- -----------------------------------------------------------------------------
@@ -45,14 +45,14 @@ CREATE OR ALTER FUNCTION fu_CalcularCostoEstiba
 RETURNS DECIMAL(10,2)
 AS
 BEGIN
-    DECLARE @v_monto_total DECIMAL(10,2);
+    DECLARE @v_monto_total DECIMAL(10,2)
     IF @p_jabas IS NULL OR @p_jabas <= 0
         SET @v_monto_total = 0.00
     ELSE
         SET @v_monto_total = @p_jabas * @p_tarifa
         
     RETURN @v_monto_total
-END;
+END
 GO
 
 -- -----------------------------------------------------------------------------
@@ -70,9 +70,9 @@ CREATE OR ALTER PROCEDURE usp_RegistrarVentaKilo
     @p_mensaje_salida VARCHAR(300) OUTPUT
 AS
 BEGIN
-    SET NOCOUNT ON;
-    DECLARE @v_id_venta INT;
-    DECLARE @v_subtotal DECIMAL(10,2);
+    SET NOCOUNT ON
+    DECLARE @v_id_venta INT
+    DECLARE @v_subtotal DECIMAL(10,2)
 
     BEGIN TRY
         IF @p_peso_kg <= 0 OR @p_precio_por_kg <= 0
@@ -98,12 +98,12 @@ BEGIN
 
         UPDATE Venta_Puesto
         SET monto_total_venta = @v_subtotal
-        WHERE id_venta = @v_id_venta;
+        WHERE id_venta = @v_id_venta
 
         SET @p_mensaje_salida = 'Venta ID ' + CAST(@v_id_venta AS VARCHAR) + ' registrada con éxito. Subtotal: S/ ' + CAST(@v_subtotal AS VARCHAR)
     END TRY
     BEGIN CATCH
         SET @p_mensaje_salida = 'ERROR en usp_RegistrarVentaKilo: ' + ERROR_MESSAGE() + ' (Línea: ' + CAST(ERROR_LINE() AS VARCHAR) + ')'
     END CATCH
-END;
+END
 GO
