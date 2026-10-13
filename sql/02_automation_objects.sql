@@ -8,11 +8,11 @@
 -- Escalares y Stored Procedures con manejo de excepciones.
 -- =============================================================================
 
-USE JOSBECORSA_OLTP;
+USE JOSBECORSA_OLTP
 GO
 
 -- -----------------------------------------------------------------------------
--- 1. VISTAS DE NEGOCIO (SEMANA 02)
+-- 1. VISTAS DE NEGOCIO 
 -- -----------------------------------------------------------------------------
 
 -- Vista para consolidar el inventario de jabas por variedad y calidad
@@ -33,7 +33,7 @@ GROUP BY l.codigo_lote, l.origen_provincia, v.nombre_variedad, c.nombre_calidad;
 GO
 
 -- -----------------------------------------------------------------------------
--- 2. FUNCIONES ALMACENADAS ESCALARES (SEMANA 03)
+-- 2. FUNCIONES ALMACENADAS ESCALARES 
 -- -----------------------------------------------------------------------------
 
 -- Función para calcular el costo total de descarga por cuadrilla de estibadores
@@ -47,11 +47,11 @@ AS
 BEGIN
     DECLARE @v_monto_total DECIMAL(10,2);
     IF @p_jabas IS NULL OR @p_jabas <= 0
-        SET @v_monto_total = 0.00;
+        SET @v_monto_total = 0.00
     ELSE
-        SET @v_monto_total = @p_jabas * @p_tarifa;
+        SET @v_monto_total = @p_jabas * @p_tarifa
         
-    RETURN @v_monto_total;
+    RETURN @v_monto_total
 END;
 GO
 
@@ -77,33 +77,33 @@ BEGIN
     BEGIN TRY
         IF @p_peso_kg <= 0 OR @p_precio_por_kg <= 0
         BEGIN
-            RAISERROR('El peso vendido y el precio por kilo deben ser mayores a cero.', 16, 1);
-            RETURN;
+            RAISERROR('El peso vendido y el precio por kilo deben ser mayores a cero.', 16, 1)
+            RETURN
         END
 
         IF NOT EXISTS (SELECT 1 FROM Cat_Ubicacion WHERE id_ubicacion = @p_id_ubicacion)
         BEGIN
-            RAISERROR('La ubicación especificada no existe en la base de datos.', 16, 1);
-            RETURN;
+            RAISERROR('La ubicación especificada no existe en la base de datos.', 16, 1)
+            RETURN
         END
 
         INSERT INTO Venta_Puesto (id_ubicacion, fecha_venta, cliente_nombre, monto_total_venta)
-        VALUES (@p_id_ubicacion, GETDATE(), @p_cliente_nombre, 0.00);
+        VALUES (@p_id_ubicacion, GETDATE(), @p_cliente_nombre, 0.00)
 
-        SET @v_id_venta = SCOPE_IDENTITY();
-        SET @v_subtotal = @p_peso_kg * @p_precio_por_kg;
+        SET @v_id_venta = SCOPE_IDENTITY()
+        SET @v_subtotal = @p_peso_kg * @p_precio_por_kg
 
         INSERT INTO Detalle_Venta_Kilo (id_venta, id_variedad, id_calidad, peso_vendido_kg, precio_por_kg)
-        VALUES (@v_id_venta, @p_id_variedad, @p_id_calidad, @p_peso_kg, @p_precio_por_kg);
+        VALUES (@v_id_venta, @p_id_variedad, @p_id_calidad, @p_peso_kg, @p_precio_por_kg)
 
         UPDATE Venta_Puesto
         SET monto_total_venta = @v_subtotal
         WHERE id_venta = @v_id_venta;
 
-        SET @p_mensaje_salida = 'Venta ID ' + CAST(@v_id_venta AS VARCHAR) + ' registrada con éxito. Subtotal: S/ ' + CAST(@v_subtotal AS VARCHAR);
+        SET @p_mensaje_salida = 'Venta ID ' + CAST(@v_id_venta AS VARCHAR) + ' registrada con éxito. Subtotal: S/ ' + CAST(@v_subtotal AS VARCHAR)
     END TRY
     BEGIN CATCH
-        SET @p_mensaje_salida = 'ERROR en usp_RegistrarVentaKilo: ' + ERROR_MESSAGE() + ' (Línea: ' + CAST(ERROR_LINE() AS VARCHAR) + ')';
+        SET @p_mensaje_salida = 'ERROR en usp_RegistrarVentaKilo: ' + ERROR_MESSAGE() + ' (Línea: ' + CAST(ERROR_LINE() AS VARCHAR) + ')'
     END CATCH
 END;
 GO

@@ -9,7 +9,7 @@
 -- Procedimiento Transaccional ACID con SAVEPOINT.
 -- =============================================================================
 
-USE JOSBECORSA_OLTP;
+USE JOSBECORSA_OLTP
 GO
 
 -- -----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ BEGIN
         precio_nuevo DECIMAL(6,2) NOT NULL,
         usuario_modificacion VARCHAR(50) NOT NULL DEFAULT SUSER_NAME(),
         fecha_modificacion DATETIME NOT NULL DEFAULT GETDATE()
-    );
+    )
 END
 GO
 
@@ -54,7 +54,7 @@ BEGIN
 
     INSERT INTO Log_Auditoria_Precios (id_detalle_venta, precio_anterior, precio_nuevo)
     VALUES (@v_id_detalle, @v_precio_anterior, @v_precio_nuevo);
-END;
+END
 GO
 
 -- -----------------------------------------------------------------------------
@@ -66,9 +66,9 @@ FOR DROP_TABLE
 AS
 BEGIN
     SET NOCOUNT ON;
-    RAISERROR('!! ACCIÓN PROHIBIDA: Se requiere autorización explícita para eliminar estructuras en JOSBECORSA_OLTP.', 16, 1);
-    ROLLBACK;
-END;
+    RAISERROR('!! ACCIÓN PROHIBIDA: Se requiere autorización explícita para eliminar estructuras en JOSBECORSA_OLTP.', 16, 1)
+    ROLLBACK
+END
 GO
 
 -- -----------------------------------------------------------------------------
@@ -87,35 +87,35 @@ CREATE OR ALTER PROCEDURE usp_RegistrarInboundLoteTransaccional
 AS
 BEGIN
     SET NOCOUNT ON;
-    DECLARE @v_id_lote INT;
+    DECLARE @v_id_lote INT
 
-    BEGIN TRANSACTION;
+    BEGIN TRANSACTION
 
     BEGIN TRY
         INSERT INTO Lote_Acopio (codigo_lote, fecha_acopio, origen_provincia, total_jabas_recibidas)
-        VALUES (@p_codigo_lote, GETDATE(), @p_origen, @p_total_jabas);
+        VALUES (@p_codigo_lote, GETDATE(), @p_origen, @p_total_jabas)
         
-        SET @v_id_lote = SCOPE_IDENTITY();
+        SET @v_id_lote = SCOPE_IDENTITY()
 
-        SAVE TRANSACTION SavePoint_LoteCreado;
+        SAVE TRANSACTION SavePoint_LoteCreado
 
         INSERT INTO Pago_Transportista (id_lote, nombre_conductor, placa_vehiculo, monto_flete, fecha_pago)
-        VALUES (@v_id_lote, @p_conductor, @p_placa, @p_monto_flete, GETDATE());
+        VALUES (@v_id_lote, @p_conductor, @p_placa, @p_monto_flete, GETDATE())
 
         INSERT INTO Pago_Estibador (id_lote, cuadrilla_nombre, jabas_descargadas, tarifa_por_jaba)
-        VALUES (@v_id_lote, @p_cuadrilla, @p_total_jabas, @p_tarifa_estiba);
+        VALUES (@v_id_lote, @p_cuadrilla, @p_total_jabas, @p_tarifa_estiba)
 
-        COMMIT TRANSACTION;
-        SET @p_resultado = 'PROCESO EXITOSO: Lote ID ' + CAST(@v_id_lote AS VARCHAR) + ' y pagos de logística registrados de forma atómica.';
+        COMMIT TRANSACTION
+        SET @p_resultado = 'PROCESO EXITOSO: Lote ID ' + CAST(@v_id_lote AS VARCHAR) + ' y pagos de logística registrados de forma atómica.'
     
     END TRY
     BEGIN CATCH
         IF @@TRANCOUNT > 0
         BEGIN
-            ROLLBACK TRANSACTION;
+            ROLLBACK TRANSACTION
         END
 
-        SET @p_resultado = 'ERROR TRANSACCIONAL: La operación fue revertida. Causa: ' + ERROR_MESSAGE();
+        SET @p_resultado = 'ERROR TRANSACCIONAL: La operación fue revertida. Causa: ' + ERROR_MESSAGE()
     END CATCH
-END;
+END
 GO

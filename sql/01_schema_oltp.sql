@@ -5,20 +5,20 @@
 -- PROPÓSITO: Definición DDL del esquema transaccional OLTP en SQL Server.
 -- =============================================================================
 
-USE master;
+USE master
 GO
 
 IF EXISTS (SELECT name FROM sys.databases WHERE name = N'JOSBECORSA_OLTP')
 BEGIN
     ALTER DATABASE JOSBECORSA_OLTP SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE JOSBECORSA_OLTP;
+    DROP DATABASE JOSBECORSA_OLTP
 END
 GO
 
 CREATE DATABASE JOSBECORSA_OLTP;
 GO
 
-USE JOSBECORSA_OLTP;
+USE JOSBECORSA_OLTP
 GO
 
 -- -----------------------------------------------------------------------------
@@ -30,27 +30,27 @@ CREATE TABLE Cat_Calidad (
     id_calidad INT IDENTITY(1,1) PRIMARY KEY,
     nombre_calidad VARCHAR(30) NOT NULL UNIQUE,
     descripcion VARCHAR(100) NULL
-);
+)
 
 -- Tipos de palta: Fuerte, Hass, Nabal
 CREATE TABLE Cat_VariedadPalta (
     id_variedad INT IDENTITY(1,1) PRIMARY KEY,
     nombre_variedad VARCHAR(30) NOT NULL UNIQUE
-);
+)
 
 -- Ubicaciones / Puestos: Cámara de frío, Puesto principal, Contingencia Tía/Amiga
 CREATE TABLE Cat_Ubicacion (
     id_ubicacion INT IDENTITY(1,1) PRIMARY KEY,
     nombre_ubicacion VARCHAR(50) NOT NULL UNIQUE,
     tipo_ubicacion VARCHAR(20) NOT NULL CHECK (tipo_ubicacion IN ('Principal', 'Frio', 'Contingencia'))
-);
+)
 
 -- Catálogo de Clientes
 CREATE TABLE Cat_Cliente (
 id_cliente INT IDENTITY(1,1) PRIMARY KEY,
 nombre_razon_social VARCHAR(150) NOT NULL UNIQUE,
 tipo_cliente VARCHAR(50) NOT NULL
-);
+)
 
 -- -----------------------------------------------------------------------------
 -- 2. OPERACIONES DE ACOPIO Y LOGÍSTICA
@@ -73,7 +73,7 @@ CREATE TABLE Detalle_Jaba (
     id_calidad INT NOT NULL FOREIGN KEY REFERENCES Cat_Calidad(id_calidad),
     codigo_color_jaba VARCHAR(20) NOT NULL,
     peso_bruto_kg DECIMAL(8,2) NOT NULL CHECK (peso_bruto_kg > 0)
-);
+)
 
 -- Pagos a Transportistas 
 CREATE TABLE Pago_Transportista (
@@ -83,7 +83,7 @@ CREATE TABLE Pago_Transportista (
     placa_vehiculo VARCHAR(15) NOT NULL,
     monto_flete DECIMAL(10,2) NOT NULL CHECK (monto_flete >= 0),
     fecha_pago DATETIME NOT NULL DEFAULT GETDATE()
-);
+)
 
 -- Pagos a Estibadores 
 CREATE TABLE Pago_Estibador (
@@ -93,7 +93,7 @@ CREATE TABLE Pago_Estibador (
     jabas_descargadas INT NOT NULL CHECK (jabas_descargadas > 0),
     tarifa_por_jaba DECIMAL(6,2) NOT NULL CHECK (tarifa_por_jaba > 0),
     monto_total AS (jabas_descargadas * tarifa_por_jaba) PERSISTED
-);
+)
 
 -- -----------------------------------------------------------------------------
 -- 3. VENTAS (REGLA DE NEGOCIO: ESTRICTAMENTE POR KILOS)
@@ -105,7 +105,7 @@ CREATE TABLE Venta_Puesto (
     fecha_venta DATETIME NOT NULL DEFAULT GETDATE(),
     cliente_nombre VARCHAR(100) NULL,
     monto_total_venta DECIMAL(10,2) NOT NULL DEFAULT 0.00
-);
+)
 
 CREATE TABLE Detalle_Venta_Kilo (
     id_detalle_venta INT IDENTITY(1,1) PRIMARY KEY,
@@ -115,7 +115,7 @@ CREATE TABLE Detalle_Venta_Kilo (
     peso_vendido_kg DECIMAL(8,2) NOT NULL CHECK (peso_vendido_kg > 0.00), -- Venta estricta en kilos
     precio_por_kg DECIMAL(6,2) NOT NULL CHECK (precio_por_kg > 0.00),
     subtotal AS (peso_vendido_kg * precio_por_kg) PERSISTED
-);
+)
 
 -- Tabla puente para relacionar qué lote específico se vendió
 CREATE TABLE Venta_Lote (
@@ -123,6 +123,6 @@ id_venta_lote INT IDENTITY(1,1) PRIMARY KEY,
 id_detalle_venta INT NOT NULL FOREIGN KEY REFERENCES Detalle_Venta_Kilo(id_detalle_venta) ON DELETE CASCADE,
 id_lote INT NOT NULL FOREIGN KEY REFERENCES Lote_Acopio(id_lote),
 kilos_descontados DECIMAL(8,2) NOT NULL CHECK (kilos_descontados > 0.00)
-);
+)
 
 GO
