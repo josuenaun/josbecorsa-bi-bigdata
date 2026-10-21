@@ -16,7 +16,7 @@ Solo necesitas hacer un `SELECT` directo.
 -- Prueba: Mostrar el resumen actual de jabas acopiadas
 SELECT * 
 FROM vw_Resumen_Acopio_Jabas
-ORDER BY total_jabas DESC;
+ORDER BY total_jabas DESC
 ```
 
 ---
@@ -31,7 +31,7 @@ Se prueba pasándole parámetros directamente en un `SELECT`. Puedes hacerlo con
 
 ```sql
 -- Prueba 1: Calcular estiba para 150 jabas a S/ 1.50 cada una
-SELECT dbo.fu_CalcularCostoEstiba(150, 1.50) AS CostoPagoCuadrilla;
+SELECT dbo.fu_CalcularCostoEstiba(150, 1.50) AS CostoPagoCuadrilla
 ```
 
 ---
