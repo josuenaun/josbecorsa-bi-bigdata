@@ -19,10 +19,10 @@ Necesitas tener un registro existente en `Detalle_Venta_Kilo`. Haremos un `UPDAT
 -- Actualizamos subiendo el precio a 6.00 (dentro del margen del 30%)
 UPDATE Detalle_Venta_Kilo 
 SET precio_por_kg = 6.00 
-WHERE id_detalle_venta = 1;
+WHERE id_detalle_venta = 1
 
 -- 2. Verificamos que se guardó en la tabla de auditoría
-SELECT * FROM Log_Auditoria_Precios ORDER BY fecha_modificacion DESC;
+SELECT * FROM Log_Auditoria_Precios ORDER BY fecha_modificacion DESC
 ```
 
 ### ❌ Escenario B: Prueba de Error (Aumento abusivo)
@@ -32,7 +32,7 @@ SELECT * FROM Log_Auditoria_Precios ORDER BY fecha_modificacion DESC;
 -- El trigger detendrá la transacción y mostrará un error
 UPDATE Detalle_Venta_Kilo 
 SET precio_por_kg = 20.00 
-WHERE id_detalle_venta = 1;
+WHERE id_detalle_venta = 1
 ```
 
 ---
@@ -47,15 +47,15 @@ Creamos una tabla temporal de prueba y luego intentamos eliminarla.
 
 ```sql
 -- 1. Creamos una tabla "basura"
-CREATE TABLE Tabla_Para_Borrar (Id INT);
+CREATE TABLE Tabla_Para_Borrar (Id INT)
 
 -- 2. Intentamos borrarla. El trigger debería saltar y mostrar: "!! ACCIÓN PROHIBIDA..."
-DROP TABLE Tabla_Para_Borrar;
+DROP TABLE Tabla_Para_Borrar
 
 -- (Opcional) Para poder borrarla realmente, el DBA debe deshabilitar el trigger temporalmente:
--- DISABLE TRIGGER trg_PrevencionDropTable ON DATABASE;
--- DROP TABLE Tabla_Para_Borrar;
--- ENABLE TRIGGER trg_PrevencionDropTable ON DATABASE;
+ DISABLE TRIGGER trg_PrevencionDropTable ON DATABASE
+ DROP TABLE Tabla_Para_Borrar;
+ ENABLE TRIGGER trg_PrevencionDropTable ON DATABASE
 ```
 
 ---
@@ -71,7 +71,7 @@ Usamos un bloque de código para capturar el resultado (`OUTPUT`).
 ### ✅ Escenario A: Registro de Lote Exitoso (Atómico)
 
 ```sql
-DECLARE @MensajeResultado VARCHAR(300);
+DECLARE @MensajeResultado VARCHAR(300)
 
 EXEC usp_RegistrarInboundLoteTransaccional 
     @p_codigo_lote = 'LOTE-TEST-001',
@@ -82,9 +82,9 @@ EXEC usp_RegistrarInboundLoteTransaccional
     @p_monto_flete = 450.00,
     @p_cuadrilla = 'Los Rápidos',
     @p_tarifa_estiba = 1.50,
-    @p_resultado = @MensajeResultado OUTPUT;
+    @p_resultado = @MensajeResultado OUTPUT
 
-SELECT @MensajeResultado AS ResultadoTransaccional;
+SELECT @MensajeResultado AS ResultadoTransaccional
 
 -- Verifica que se insertaron los 3 registros (Lote_Acopio, Pago_Transportista, Pago_Estibador)
 ```
@@ -92,7 +92,7 @@ SELECT @MensajeResultado AS ResultadoTransaccional;
 ### ❌ Escenario B: Falla Transaccional (Rollback Automático)
 
 ```sql
-DECLARE @MensajeError VARCHAR(300);
+DECLARE @MensajeError VARCHAR(300)
 
 -- Simulamos un error enviando datos inválidos (ej. asumiendo que la tarifa no permite NULLs o forzando un fallo de tipo de dato si modificas el script para pruebas, o enviando un texto demasiado largo que desborde un varchar)
 -- NOTA: Como ejemplo, enviamos un origen demasiado largo para forzar truncamiento/error de inserción
@@ -105,9 +105,9 @@ EXEC usp_RegistrarInboundLoteTransaccional
     @p_monto_flete = 300.00,
     @p_cuadrilla = 'Cuadrilla Norte',
     @p_tarifa_estiba = 1.50,
-    @p_resultado = @MensajeError OUTPUT;
+    @p_resultado = @MensajeError OUTPUT
 
-SELECT @MensajeError AS ResultadoRollback;
+SELECT @MensajeError AS ResultadoRollback
 
 -- Verificas que NO se insertó el LOTE-ERR-002 en Lote_Acopio porque todo se revirtió.
 ```

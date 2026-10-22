@@ -54,7 +54,7 @@ Debes declarar la variable de salida (`OUTPUT`), ejecutar el procedimiento con `
 ### ✅ Escenario A: Venta Exitosa
 
 ```sql
-DECLARE @MensajeResultado VARCHAR(300);
+DECLARE @MensajeResultado VARCHAR(300)
 
 -- Ejecutamos simulando la venta de 50.5 kg de palta a S/ 6.50 el kilo
 EXEC usp_RegistrarVentaKilo 
@@ -64,16 +64,16 @@ EXEC usp_RegistrarVentaKilo
     @p_id_calidad = 1,            -- ID calidad (ej. Primera)
     @p_peso_kg = 50.50,
     @p_precio_por_kg = 6.50,
-    @p_mensaje_salida = @MensajeResultado OUTPUT;
+    @p_mensaje_salida = @MensajeResultado OUTPUT
 
 -- Ver el mensaje que devuelve el SP
-SELECT @MensajeResultado AS ResultadoTransaccion;
+SELECT @MensajeResultado AS ResultadoTransaccion
 ```
 
 ### ❌ Escenario B: Prueba de Error (Validación)
 
 ```sql
-DECLARE @MensajeError VARCHAR(300);
+DECLARE @MensajeError VARCHAR(300)
 
 -- Forzamos un error enviando un precio negativo (-5.00)
 EXEC usp_RegistrarVentaKilo 
@@ -83,8 +83,8 @@ EXEC usp_RegistrarVentaKilo
     @p_id_calidad = 1,
     @p_peso_kg = 20.00,
     @p_precio_por_kg = -5.00,     -- ¡Dato inválido!
-    @p_mensaje_salida = @MensajeError OUTPUT;
+    @p_mensaje_salida = @MensajeError OUTPUT
 
 -- El SP debería capturar el RAISERROR y mostrar el mensaje correspondiente
-SELECT @MensajeError AS ResultadoValidacion;
+SELECT @MensajeError AS ResultadoValidacion
 ```
