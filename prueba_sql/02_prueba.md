@@ -24,7 +24,7 @@ ORDER BY total_jabas DESC
 ## 2. Función Escalar: `fu_CalcularCostoEstiba`
 
 **🎯 ¿Para qué sirve?**
-Centraliza el cálculo matemático para los pagos logísticos. Multiplica la cantidad de jabas descargadas por la tarifa acordada. Se utiliza para estandarizar la columna calculada monto_total en la tabla Pago_Estibador. Si la fórmula contable de la empresa cambia, solo se modifica esta función sin alterar las aplicaciones web.
+Centraliza el cálculo matemático para los pagos logísticos. Multiplica la cantidad de jabas descargadas por la tarifa acordada. Se utiliza para estandarizar la columna calculada monto_total en la tabla `Pago_Estibador`. Si la fórmula contable de la empresa cambia, solo se modifica esta función sin alterar las aplicaciones web.
 
 **⚙️ ¿Cómo probarlo?**
 Se prueba pasándole parámetros directamente en un `SELECT`. Puedes hacerlo con valores estáticos o aplicándolo a una tabla.
