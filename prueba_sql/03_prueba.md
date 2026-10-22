@@ -40,7 +40,7 @@ WHERE id_detalle_venta = 1
 ## 2. Trigger DDL: `trg_PrevencionDropTable`
 
 **🎯 ¿Para qué sirve?**
-Protege la estructura (el esquema) de la base de datos a nivel global. Evita que cualquier usuario (incluso con ciertos privilegios) elimine una tabla por accidente con el comando `DROP TABLE`. 
+Protege la estructura global de JOSBECORSA. Bloquea cualquier comando `DROP TABLE`, impidiendo que usuarios o desarrolladores eliminen por accidente tablas maestras críticas como `Cat_Cliente` o `Lote_Acopio`.
 
 **⚙️ ¿Cómo probarlo?**
 Creamos una tabla temporal de prueba y luego intentamos eliminarla.
@@ -63,7 +63,7 @@ DROP TABLE Tabla_Para_Borrar
 ## 3. SP Transaccional: `usp_RegistrarInboundLoteTransaccional`
 
 **🎯 ¿Para qué sirve?**
-Garantiza el principio **ACID** (Atomicidad, Consistencia, Aislamiento, Durabilidad). Cuando llega un camión, hay que registrar el lote, pagarle al transportista y pagar a la cuadrilla de estibadores. Si una de esas tres cosas falla (por ejemplo, falta un dato del pago), el SP hace un `ROLLBACK` y cancela TODO. Así evitamos tener lotes fantasma sin pagos asociados. Utiliza `SAVEPOINT` para un control más fino internamente.
+Garantiza el principio de Atomicidad (Todo o Nada). Cuando llega mercadería, JOSBECORSA debe registrar 3 cosas: el `Lote_Acopio`, el `Pago_Transportista` y el `Pago_Estibador`. Este SP envuelve todo en un `BEGIN TRANSACTION`. Si el pago al estibador falla, hace un `ROLLBACK` y cancela también la creación del lote, evitando descuadres logísticos (lotes ingresados sin costos asociados).
 
 **⚙️ ¿Cómo probarlo?**
 Usamos un bloque de código para capturar el resultado (`OUTPUT`).

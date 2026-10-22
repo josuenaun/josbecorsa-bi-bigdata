@@ -7,7 +7,7 @@ Esta guía detalla el propósito y los scripts de prueba para los objetos progra
 ## 1. Vista: `vw_Resumen_Acopio_Jabas`
 
 **🎯 ¿Para qué sirve?**
-Actúa como una "fotografía" prearmada que consolida el inventario. En lugar de escribir los `INNER JOIN` entre lotes, detalles, variedades y calidades cada vez que el área de acopio necesita un reporte, simplemente consultas la vista. Es ideal para conectar a un futuro dashboard.
+Realiza un cruce (`INNER JOIN`) automático entre las tablas `Lote_Acopio`, `Detalle_Jaba` y los catálogos de Variedad y Calidad. En el diseño original, `Lote_Acopio` solo tiene el total de jabas. Esta vista le permite al jefe de almacén saber exactamente cuántas jabas de una variedad y calidad específica (ej. "Palta Hass de 1era") llegaron, sin tener que escribir consultas complejas.
 
 **⚙️ ¿Cómo probarlo?**
 Solo necesitas hacer un `SELECT` directo.
@@ -24,7 +24,7 @@ ORDER BY total_jabas DESC
 ## 2. Función Escalar: `fu_CalcularCostoEstiba`
 
 **🎯 ¿Para qué sirve?**
-Centraliza la lógica matemática del negocio. Si la fórmula para pagar a las cuadrillas de estibadores en provincia o en el mercado cambia mañana, solo actualizas esta función y el cambio se reflejará en todo el sistema. Retorna un único valor (el costo).
+Centraliza el cálculo matemático para los pagos logísticos. Multiplica la cantidad de jabas descargadas por la tarifa acordada. Se utiliza para estandarizar la columna calculada monto_total en la tabla Pago_Estibador. Si la fórmula contable de la empresa cambia, solo se modifica esta función sin alterar las aplicaciones web.
 
 **⚙️ ¿Cómo probarlo?**
 Se prueba pasándole parámetros directamente en un `SELECT`. Puedes hacerlo con valores estáticos o aplicándolo a una tabla.
